@@ -1,0 +1,43 @@
+replicaCount: 1
+
+image:
+  repository: gabendockerzone/dog-vision
+  pullPolicy: Always
+  tag: "latest"
+
+namespace: dog-vision
+
+service:
+  type: ClusterIP
+  port: 5001
+  targetPort: 5001
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: dog-vision.rewura.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: dog-vision-tls
+      hosts:
+        - dog-vision.rewura.com
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+env:
+  - name: PYTHONUNBUFFERED
+    value: "1"
+  - name: FLASK_APP
+    value: "app.py"

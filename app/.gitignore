@@ -1,0 +1,15 @@
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Application specific
+.tfhub_cache/
+uploads/
+.DS_Store

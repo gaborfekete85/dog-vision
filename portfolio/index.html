@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Vision — Deep Learning Dog Breed Classifier</title>
+    <meta name="description" content="A deep learning project using TensorFlow and the Kaggle Dog Breed Identification dataset to recognize 120 different dog breeds from a single photo.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0f172a;
+            --bg-soft: #1e293b;
+            --card: #1e293b;
+            --border: #334155;
+            --accent: #f59e0b;
+            --accent-hover: #fbbf24;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --link: #60a5fa;
+            --link-hover: #93c5fd;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+                         Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .top-bar {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-bar-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand .dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--accent);
+        }
+
+        .top-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .top-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.92rem;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border);
+        }
+
+        .top-link.primary {
+            background: var(--accent);
+            color: #1a1a1a;
+            border-color: var(--accent);
+        }
+
+        .top-link.primary:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .top-link.secondary {
+            background: transparent;
+            color: var(--text);
+        }
+
+        .top-link.secondary:hover {
+            background: var(--bg-soft);
+            border-color: var(--muted);
+            transform: translateY(-1px);
+        }
+
+        .top-link svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 4rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 2rem 0 3.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 3rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.9rem;
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.25rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.25rem;
+            background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .lead {
+            font-size: 1.15rem;
+            color: var(--muted);
+            max-width: 720px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        h2 .accent {
+            color: var(--accent);
+        }
+
+        p {
+            color: var(--muted);
+            margin-bottom: 1rem;
+        }
+
+        p strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .card .icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(245, 158, 11, 0.15);
+            border-radius: 10px;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .card .icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .chip {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .pipeline {
+            counter-reset: step;
+            list-style: none;
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .pipeline li {
+            position: relative;
+            padding: 1.1rem 1.25rem 1.1rem 3.75rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            counter-increment: step;
+        }
+
+        .pipeline li::before {
+            content: counter(step);
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            color: #1a1a1a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .pipeline li strong {
+            display: block;
+            color: var(--text);
+            margin-bottom: 0.15rem;
+        }
+
+        .pipeline li span {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .cta {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.04) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 14px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .cta h2 {
+            margin-bottom: 0.75rem;
+        }
+
+        .cta p {
+            margin-bottom: 1.5rem;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--link);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--link-hover);
+        }
+
+        @media (max-width: 600px) {
+            .top-bar-inner {
+                justify-content: center;
+            }
+            .brand {
+                width: 100%;
+                justify-content: center;
+            }
+            .top-links {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="top-bar">
+        <div class="top-bar-inner">
+            <div class="brand">
+                <span class="dot"></span>
+                Dog Vision
+            </div>
+            <nav class="top-links">
+                <a class="top-link primary" href="https://dog-vision.rewura.com" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Live Application
+                </a>
+                <a class="top-link secondary" href="https://github.com/gaborfekete85/dog-vision" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.34.95.1-.74.4-1.24.73-1.53-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18.91-.25 1.89-.38 2.86-.38.97 0 1.95.13 2.86.38 2.18-1.49 3.14-1.18 3.14-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.41-5.25 5.69.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.21.67.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <span class="badge">Deep Learning · Computer Vision</span>
+            <h1>Identify Any Dog Breed From a Single Photo</h1>
+            <p class="lead">
+                Dog Vision is an end-to-end deep learning project built with TensorFlow that
+                trains a convolutional neural network on the Kaggle Dog Breed Identification
+                dataset to classify 120 different breeds from a single uploaded image.
+            </p>
+            <div class="hero-actions">
+                <a class="top-link primary" href="https://dog-vision.rewura.com" target="_blank" rel="noopener">
+                    Try the live demo
+                </a>
+                <a class="top-link secondary" href="https://github.com/gaborfekete85/dog-vision" target="_blank" rel="noopener">
+                    View source on GitHub
+                </a>
+            </div>
+        </section>
+
+        <section>
+            <h2>The <span class="accent">Intent</span> Behind the Project</h2>
+            <p>
+                Identifying a dog's breed from a photo is a fun, real-world problem that maps
+                naturally to a <strong>multi-class image classification</strong> task — and one
+                that perfectly showcases the power of modern deep learning. Dog Vision was built
+                as a hands-on exploration of how transfer learning and pre-trained convolutional
+                neural networks can be combined with a relatively modest dataset to deliver
+                practical, accurate predictions.
+            </p>
+            <p>
+                The goal goes beyond just training a model. The project covers the full machine
+                learning lifecycle: from <strong>raw data preparation</strong> on the Kaggle
+                dataset, through <strong>model training and evaluation</strong>, all the way to
+                serving the model as a <strong>live web application</strong> where anyone can
+                upload a photo of a dog and instantly receive the model's best guess at its
+                breed.
+            </p>
+        </section>
+
+        <section>
+            <h2>What Makes It Tick</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        </svg>
+                    </div>
+                    <h3>120 Distinct Breeds</h3>
+                    <p>Trained on the Kaggle Dog Breed Identification dataset containing over 10,000 labeled images spanning 120 unique breeds.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 6v6l4 2"></path>
+                        </svg>
+                    </div>
+                    <h3>Transfer Learning</h3>
+                    <p>Leverages a pre-trained CNN backbone from TensorFlow Hub to dramatically reduce training time and improve accuracy.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                            <path d="M3 9h18"></path>
+                        </svg>
+                    </div>
+                    <h3>Web-Based Inference</h3>
+                    <p>Upload a photo through a simple web UI and receive a breed prediction in seconds — no installation required.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5"></path>
+                            <path d="M2 12l10 5 10-5"></path>
+                        </svg>
+                    </div>
+                    <h3>Reproducible Notebook</h3>
+                    <p>Everything from data loading to evaluation lives in a clean Jupyter notebook so the workflow can be re-run end-to-end.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>How It Works</h2>
+            <ol class="pipeline">
+                <li>
+                    <strong>Data preparation</strong>
+                    <span>Download and organize the Kaggle Dog Breed Identification dataset, then convert images and labels into TensorFlow batched datasets ready for training.</span>
+                </li>
+                <li>
+                    <strong>Model construction</strong>
+                    <span>Build a transfer-learning model on top of a pre-trained vision backbone, with a classification head sized to predict across all 120 breeds.</span>
+                </li>
+                <li>
+                    <strong>Training & evaluation</strong>
+                    <span>Train on GPU with callbacks for early stopping and TensorBoard logging, then evaluate accuracy and inspect predictions on the validation set.</span>
+                </li>
+                <li>
+                    <strong>Serving</strong>
+                    <span>Wrap the trained model in a lightweight web app that accepts a photo upload, runs inference, and returns the most likely breed along with confidence scores.</span>
+                </li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Tech Stack</h2>
+            <p>The project brings together the modern Python ML ecosystem and a small web layer for delivery:</p>
+            <div class="stack">
+                <span class="chip">Python</span>
+                <span class="chip">TensorFlow</span>
+                <span class="chip">TensorFlow Hub</span>
+                <span class="chip">Keras</span>
+                <span class="chip">NumPy</span>
+                <span class="chip">Pandas</span>
+                <span class="chip">Matplotlib</span>
+                <span class="chip">Jupyter</span>
+                <span class="chip">Docker</span>
+                <span class="chip">Kaggle Dataset</span>
+            </div>
+        </section>
+
+        <section class="cta">
+            <h2>See It In Action</h2>
+            <p>Upload a photo of any dog and let the model take its best guess.</p>
+            <div class="hero-actions">
+                <a class="top-link primary" href="https://dog-vision.rewura.com" target="_blank" rel="noopener">
+                    Open the live app
+                </a>
+                <a class="top-link secondary" href="https://github.com/gaborfekete85/dog-vision" target="_blank" rel="noopener">
+                    Browse the code
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        Built by <a href="https://github.com/gaborfekete85" target="_blank" rel="noopener">Gabor Fekete</a> · Powered by TensorFlow &amp; the Kaggle Dog Breed Identification dataset
+    </footer>
+</body>
+</html>

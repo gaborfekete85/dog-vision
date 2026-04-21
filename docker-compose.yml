@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  dog-vision:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: dog-vision
+    ports:
+      - "5001:5001"
+    volumes:
+      # Mount the local app folder so that edits to code reflect inside container
+      # without needing to rebuild (you would need to restart the container though)
+      - ./app:/project/app
+      # Mount the drive directory so the app can access labels.csv and models
+      - ./drive:/project/drive
+    environment:
+      # Force Keras 2 so hub.KerasLayer loads cleanly in TF 2.15
+      - TF_USE_LEGACY_KERAS=1
+      # Hide TF info/warning noise
+      - TF_CPP_MIN_LOG_LEVEL=2

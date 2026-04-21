@@ -1,0 +1,19 @@
+# Exclude unnecessary directories and files
+.git
+.DS_Store
+dog_vision.ipynb
+docker-compose.yml
+
+# Exclude large dataset files we don't need in the Docker image
+drive/MyDrive/train
+drive/MyDrive/test
+drive/MyDrive/MyDogs
+drive/MyDrive/dog-breed-identification.zip
+drive/MyDrive/sample_submission.csv
+
+# Exclude app-specific items
+app/.venv
+app/__pycache__
+app/*.pyc
+app/.tfhub_cache
+app/uploads

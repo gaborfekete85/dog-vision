@@ -1,0 +1,6 @@
+apiVersion: v2
+name: dog-vision
+description: A Helm chart for Dog Vision application
+type: application
+version: 0.1.0
+appVersion: "1.0"

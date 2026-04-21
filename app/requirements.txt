@@ -1,0 +1,11 @@
+# Pinned to match the TF 2.15 / Keras-2 stack the notebook was trained on.
+# These versions are known to load the saved `.h5` model containing a
+# tensorflow_hub.KerasLayer without any conversion steps.
+tensorflow==2.15.1
+tensorflow-hub==0.16.1
+tf-keras==2.15.1
+numpy==1.26.4
+pandas==2.2.2
+Pillow==10.3.0
+Flask==3.0.3
+setuptools<70.0.0
